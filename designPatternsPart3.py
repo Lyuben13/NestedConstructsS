@@ -232,55 +232,165 @@ from abc import ABC, abstractmethod
 import math
 
 
-# Element
-class Shape(ABC):
+# # Element
+# class Shape(ABC):
+#     @abstractmethod
+#     def accept(self, visitor):
+#         pass
+#
+#
+# # Concrete Elements
+# class Circle(Shape):
+#     def __init__(self, radius):
+#         self.radius = radius
+#
+#     def accept(self, visitor):
+#         visitor.visit_circle(self)
+#
+#
+# class Rectangle(Shape):
+#     def __init__(self, width, height):
+#         self.width = width
+#         self.height = height
+#
+#     def accept(self, visitor):
+#         visitor.visit_rectangle(self)
+#
+#
+# # Visitor
+# class ShapeVisitor(ABC):
+#     @abstractmethod
+#     def visit_circle(self, circle):
+#         pass
+#
+#     @abstractmethod
+#     def visit_rectangle(self, rectangle):
+#         pass
+#
+#
+# class AreaVisitor(ShapeVisitor):
+#     def visit_circle(self, circle):
+#         print(f'Area of Circle: {math.pi * circle.radius ** 2}')
+#
+#     def visit_rectangle(self, rectangle):
+#         print(f'Area of Rectangle: {rectangle.width * rectangle.height}')
+#
+#
+# # Client code
+# circle = Circle(5)
+# rectangle = Rectangle(10, 5)
+#
+# area_visitor = AreaVisitor()
+#
+# circle.accept(area_visitor)
+# rectangle.accept(area_visitor)
+
+
+# Memento
+# class EditorMemento:
+#     def __init__(self, content):
+#         self.content = content
+#
+#     def get_content(self):
+#         return self.content
+#
+#
+# # Originator
+# class Editor:
+#     def __init__(self):
+#         self.content = ''
+#
+#     def type(self, words):
+#         self.content += ' ' + words
+#
+#     def save(self):
+#         return EditorMemento(self.content)
+#
+#     def restore(self, memento):
+#         self.content = memento.get_content()
+#
+#
+# # Caretaker
+# class Caretaker:
+#     def __init__(self):
+#         self.mementos = []
+#
+#     def add_memento(self, memento):
+#         self.mementos.append(memento)
+#
+#     def get_memento(self, index):
+#         return self.mementos[index]
+#
+#
+# # Client code
+# editor = Editor()
+# caretaker = Caretaker()
+#
+# editor.type('Hello')
+# editor.type('World')
+#
+# caretaker.add_memento(editor.save())
+#
+# editor.type('!!!')
+#
+# # Output: Hello World !!!
+# print(editor.content)
+#
+# # Undo
+# editor.restore(caretaker.get_memento(0))
+# # Output: Hello World
+# print(editor.content)
+
+from abc import ABC, abstractmethod
+
+
+# Abstract Expression
+class Expression(ABC):
     @abstractmethod
-    def accept(self, visitor):
+    def interpret(self, context):
         pass
 
 
-# Concrete Elements
-class Circle(Shape):
-    def __init__(self, radius):
-        self.radius = radius
+# Terminal Expression
+class NumberExpression(Expression):
+    def __init__(self, value):
+        self.value = value
 
-    def accept(self, visitor):
-        visitor.visit_circle(self)
-
-
-class Rectangle(Shape):
-    def __init__(self, width, height):
-        self.width = width
-        self.height = height
-
-    def accept(self, visitor):
-        visitor.visit_rectangle(self)
+    def interpret(self, context):
+        return self.value
 
 
-# Visitor
-class ShapeVisitor(ABC):
-    @abstractmethod
-    def visit_circle(self, circle):
-        pass
+# Nonterminal Expression for Addition
+class AddExpression(Expression):
+    def __init__(self, left, right):
+        self.left = left
+        self.right = right
 
-    @abstractmethod
-    def visit_rectangle(self, rectangle):
-        pass
+    def interpret(self, context):
+        return self.left.interpret(context) + self.right.interpret(context)
 
 
-class AreaVisitor(ShapeVisitor):
-    def visit_circle(self, circle):
-        print(f'Area of Circle: {math.pi * circle.radius ** 2}')
+# Nonterminal Expression for Subtraction
+class SubtractExpression(Expression):
+    def __init__(self, left, right):
+        self.left = left
+        self.right = right
 
-    def visit_rectangle(self, rectangle):
-        print(f'Area of Rectangle: {rectangle.width * rectangle.height}')
+    def interpret(self, context):
+        return self.left.interpret(context) - self.right.interpret(context)
 
 
 # Client code
-circle = Circle(5)
-rectangle = Rectangle(10, 5)
+context = {}
 
-area_visitor = AreaVisitor()
+# Represents an expression: (1 + (2 - 3))
+expression = AddExpression(
+    NumberExpression(1),
+    SubtractExpression(
+        NumberExpression(2),
+        NumberExpression(3)
+    )
+)
 
-circle.accept(area_visitor)
-rectangle.accept(area_visitor)
+# Output: 0
+print(expression.interpret(context))
