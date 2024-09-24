@@ -46,7 +46,6 @@ class Developer(Employee):
         print(f"Job title - {self.job_title}; Salary - {self.salary}; Seniority - {self.seniority} years")
 
     def get_sick_leave(self):
-        # Assuming more seniority should result in more sick leave, correcting the logic
         if self.seniority > 5:
             return 3
         return 1
